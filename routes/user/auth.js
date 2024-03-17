@@ -1,9 +1,11 @@
+const isUser = require("../../middleware/isUser.js");
 const sendMail = require("../../utils/sendMail.js");
 
 const express = require("express"),
   client = require("../../database/db"),
   bcrypt = require("bcryptjs"),
   path = require("path"), // Add this line to import the path module
+  fs = require("fs"),
   {
     validateUser,
     validateLogin,
@@ -144,6 +146,110 @@ router.post("/user/resetpass", async (req, res) => {
     res.json({ msg: "password is changed" });
   } else {
     res.status(404).json({ msg: "verify code is not correct" });
+  }
+});
+
+
+router.delete("/user/deleteprofile", isUser, async (req, res) => {
+  try {
+    const profileImagePath = "http://localhost:6666/images/profile.png";
+    const userId = req.body.id;
+
+    // Validate userId to prevent SQL injection
+    if (!userId) {
+      return res.status(400).json({ msg: "User ID is required" });
+    }
+
+    const queryResult = await client.query(
+      "SELECT image FROM users WHERE id = $1",
+      [userId]
+    );
+
+    if (queryResult.rows.length === 0) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const userImage = queryResult.rows[0].image;
+
+    if (userImage !== profileImagePath) {
+      console.log(userImage);
+
+      const imagePath = path.join(
+        __dirname,
+        `../../${userImage.replace("http://localhost:6666/", "")}`
+      );
+      // Delete the image file
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error("Error deleting image:", err);
+        }
+      });
+
+      // Update user's profile image to default
+      await client.query("UPDATE users SET image = $1 WHERE id = $2", [
+        profileImagePath,
+        userId,
+      ]);
+
+      return res.json({ msg: "Profile image deleted" });
+    } else {
+      return res.status(402).json({ msg: "You don't have a custom profile image" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
+
+router.put("/user/changeprofile", photoUpload.single("image"), isUser, async (req, res) => {
+  try {
+    const profileImagePath = "http://localhost:6666/images/profile.png";
+    const userId = req.body.id;
+
+    // Validate user ID
+    if (!userId) {
+      return res.status(400).json({ msg: "User ID is required" });
+    }
+
+    // Check if image file is uploaded
+    if (req.file) {
+      // Fetch user's current image from the database
+      const queryResult = await client.query("SELECT image FROM users WHERE id = $1", [userId]);
+      
+      if (queryResult.rows.length === 0) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+
+      const userImage = queryResult.rows[0].image;
+
+      // Delete the old image if it's not the default profile image
+      if (userImage !== profileImagePath) {
+        const imagePath = path.join(__dirname, `../../${userImage.replace("http://localhost:6666/", "")}`);
+
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error("Error deleting image:", err);
+          }
+        });
+      }
+
+      // Construct the new image path
+      const newImagePath = `http://localhost:6666/images/${req.file.filename}`;
+
+      // Update user's profile image in the database
+      await client.query("UPDATE users SET image = $1 WHERE id = $2", [
+        newImagePath,
+        userId,
+      ]);
+
+      return res.json({ msg: "Profile image updated successfully" });
+    } else {
+      return res.status(400).json({ msg: "Image file is required" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ msg: "Internal server error" });
   }
 });
 
