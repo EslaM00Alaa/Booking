@@ -21,10 +21,48 @@ async function isReady() {
         active BOOLEAN DEFAULT true ,
         image VARCHAR(255) DEFAULT 'http://localhost:6666/images/profile.png' 
       );`,
+          `
+            CREATE TABLE IF NOT EXISTS category (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            image VARCHAR(255)
+            );
+          `,
+      //     `
+      //  CREATE TABLE IF NOT EXISTS attachments (
+      //   id SERIAL PRIMARY KEY,
+      //   owner_id INT REFERENCES users (id) NOT NULL,
+      //   attachment VARCHAR(255) 
+      //   );
+      // `,
+      // `
+      //   CREATE TABLE IF NOT EXISTS places (
+      //   id SERIAL PRIMARY KEY ,
+      //   owner_id INT REFERENCES users (id) NOT NULL ,
+      //   active BOOLEAN DEFAULT false ,
+         
+        
+      //   );
+      // `,
+      // `
+      //   CREATE TABLE IF NOT EXISTS places_images (
+      //   id SERIAL PRIMARY KEY ,
+      //   place_id INT REFERENCES places (id) NOT NULL ,
+      //   image VARCHAR(255) NOT NULL
+      //   );
+      // `,
+      // `
+      //   CREATE TABLE IF NOT EXISTS free_day (
+      //   id SERIAL PRIMARY KEY ,
+      //   place_id INT  REFERENCES places (id) NOT NULL ,
+      //   );
+      // `
+      
+
     ];
 
     const tablesToCheck = [
-      "users"
+      "users","category"
     ];
 
     let c = 0;
