@@ -29,8 +29,11 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/api",require("./routes/user/auth"))
 app.use("/api",require("./routes/admin/auth"))
+app.use("/api",require("./routes/owner/auth"))
 app.use("/api",require("./routes/admin/mange"))
-
+app.use("/api",require("./routes/admin/owner_requests"))
+app.use("/api",require("./routes/admin/places_request"))
+app.use("/api",require("./routes/owner/places"))
 
 
 

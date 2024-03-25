@@ -13,7 +13,7 @@ const express = require("express"),
     validateChangePass,
   } = require("../../models/user"),
   photoUpload = require("../../utils/uploadimage.js"),
-  generateToken = require("../../utils/UserToken.js"),
+  {generateToken} = require("../../utils/ownerToken.js"),
   router = express.Router();
 
 router.post("/user/register", photoUpload.single("image"), async (req, res) => {
@@ -35,26 +35,26 @@ router.post("/user/register", photoUpload.single("image"), async (req, res) => {
     // Fix the query to insert user data into the database
     if (imagePath) {
       result = await client.query(
-        `INSERT INTO users (user_name, mail, pass, image) VALUES ($1, $2, $3, $4) RETURNING id, role, mail;`,
+        `INSERT INTO users (user_name, mail, pass, image) VALUES ($1, $2, $3, $4) RETURNING * ;`,
         [user_name, mail, hashedPass, imagePath]
       );
     } else {
       result = await client.query(
-        `INSERT INTO users (user_name, mail, pass) VALUES ($1, $2, $3) RETURNING id, role, mail;`,
+        `INSERT INTO users (user_name, mail, pass) VALUES ($1, $2, $3) RETURNING * ;`,
         [user_name, mail, hashedPass]
       );
     }
 
     const { id, mail: umail, role: urole } = result.rows[0];
     const token = generateToken(id, umail, urole);
-
-    res.json({ role: urole, token: token });
+    let {verify_code,pass,...data}= result.rows[0]
+    res.json({ token: token , data });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }
 });
 
-router.post("/user/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { error } = validateLogin(req.body);
     if (error) return res.status(400).json({ msg: error.details[0].message });
@@ -69,11 +69,13 @@ router.post("/user/login", async (req, res) => {
 
       if (isPasswordMatch) {
         const { pass, verify_code, ...userData } = result.rows[0];
+        console.log(result.rows[0].active);
         return res.json({
           token: generateToken(
             result.rows[0].id,
             result.rows[0].mail,
-            result.rows[0].role
+            result.rows[0].role,
+            result.rows[0].active
           ),
           data: userData,
         });
@@ -88,7 +90,7 @@ router.post("/user/login", async (req, res) => {
   }
 });
 
-router.post("/user/verifycode", async (req, res) => {
+router.post("/verifycode", async (req, res) => {
   try {
     const { error } = validateEmail(req.body);
     if (error) {
@@ -117,7 +119,7 @@ router.post("/user/verifycode", async (req, res) => {
   }
 });
 
-router.post("/user/resetpass", async (req, res) => {
+router.post("/resetpass", async (req, res) => {
   const { error } = validateChangePass({
     code: req.body.code,
     mail: req.body.mail,
@@ -150,7 +152,7 @@ router.post("/user/resetpass", async (req, res) => {
 });
 
 
-router.delete("/user/deleteprofile", isUser, async (req, res) => {
+router.delete("/deleteprofile", isUser, async (req, res) => {
   try {
     const profileImagePath = "http://localhost:6666/images/profile.png";
     const userId = req.body.id;
@@ -202,7 +204,7 @@ router.delete("/user/deleteprofile", isUser, async (req, res) => {
 });
 
 
-router.put("/user/changeprofile", photoUpload.single("image"), isUser, async (req, res) => {
+router.put("/changeprofile", photoUpload.single("image"), isUser, async (req, res) => {
   try {
     const profileImagePath = "http://localhost:6666/images/profile.png";
     const userId = req.body.id;

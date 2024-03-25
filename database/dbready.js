@@ -28,41 +28,79 @@ async function isReady() {
             image VARCHAR(255)
             );
           `,
-      //     `
-      //  CREATE TABLE IF NOT EXISTS attachments (
-      //   id SERIAL PRIMARY KEY,
-      //   owner_id INT REFERENCES users (id) NOT NULL,
-      //   attachment VARCHAR(255) 
-      //   );
-      // `,
-      // `
-      //   CREATE TABLE IF NOT EXISTS places (
-      //   id SERIAL PRIMARY KEY ,
-      //   owner_id INT REFERENCES users (id) NOT NULL ,
-      //   active BOOLEAN DEFAULT false ,
-         
-        
-      //   );
-      // `,
-      // `
-      //   CREATE TABLE IF NOT EXISTS places_images (
-      //   id SERIAL PRIMARY KEY ,
-      //   place_id INT REFERENCES places (id) NOT NULL ,
-      //   image VARCHAR(255) NOT NULL
-      //   );
-      // `,
-      // `
-      //   CREATE TABLE IF NOT EXISTS free_day (
-      //   id SERIAL PRIMARY KEY ,
-      //   place_id INT  REFERENCES places (id) NOT NULL ,
-      //   );
-      // `
+          `
+          CREATE TABLE IF NOT EXISTS owner_attachment (
+           id SERIAL PRIMARY KEY,
+           owner_id INT REFERENCES users (id) NOT NULL,
+           attachment VARCHAR(255) 
+          );
+       `,
+       `
+       CREATE TABLE IF NOT EXISTS places (
+        id SERIAL PRIMARY KEY,
+        owner_id INT REFERENCES users(id) NOT NULL,
+        category_id INT REFERENCES category(id) NOT NULL,
+        active BOOLEAN DEFAULT false,
+        name VARCHAR(255) NOT NULL,
+        address VARCHAR(500) NOT NULL,
+        description VARCHAR(500) NOT NULL,
+        nsign INT DEFAULT 0,
+        location VARCHAR(500) NOT NULL,
+        min_hours REAL,
+        hour_salary REAL
+        );    
+      `,
+      `
+      CREATE TABLE IF NOT EXISTS place_attachment (
+       id SERIAL PRIMARY KEY,
+       place_id INT REFERENCES places (id) NOT NULL,
+       attachment VARCHAR(255) 
+      );
+   `,
+      `
+      CREATE TABLE IF NOT EXISTS places_images (
+        id SERIAL PRIMARY KEY,
+        place_id INT REFERENCES places(id) NOT NULL,
+        image VARCHAR(255) NOT NULL
+        );    
+      `,
+          `
+          CREATE TABLE IF NOT EXISTS days (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255)
+            );
+            INSERT INTO days (name) VALUES
+            ('Sunday'),
+            ('Monday'),
+            ('Tuesday'),
+            ('Wednesday'),
+            ('Thursday'),
+            ('Friday'),
+            ('Saturday');
+
+          `
+      ,
+      `
+      CREATE TABLE IF NOT EXISTS free_day (
+        id SERIAL PRIMARY KEY,
+        place_id INT REFERENCES places(id) NOT NULL,
+        day_id INT REFERENCES days(id) NOT NULL
+        );
+      `,
+      `
+      CREATE TABLE IF NOT EXISTS feedbacks (
+        id SERIAL PRIMARY KEY,
+        description VARCHAR(255),
+        writer_id INT REFERENCES users(id),
+        writed_id INT
+       );
+      `
       
 
     ];
 
     const tablesToCheck = [
-      "users","category"
+      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks"
     ];
 
     let c = 0;
