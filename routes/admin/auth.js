@@ -11,7 +11,7 @@ const express = require("express"),
     validateChangePass,
   } = require("../../models/user"),
   photoUpload = require("../../utils/uploadimage.js"),
-  generateToken = require("../../utils/ownerToken.js"),
+  {generateToken} = require("../../utils/ownerToken.js"),
   router = express.Router();
 
 router.post("/admin/register", photoUpload.single("image"), async (req, res) => {

@@ -88,7 +88,7 @@ router.delete("/category/:id",isAdmin,async(req,res)=>{
 
 
 
-router.post('/puler', photoUpload.single("image"), isAdmin, async (req, res) => {
+router.post('/banner', photoUpload.single("image"), isAdmin, async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ msg: "Image is required" });
@@ -105,7 +105,7 @@ router.post('/puler', photoUpload.single("image"), isAdmin, async (req, res) => 
 });
 
 
-router.get('/puler', async (req, res) => {
+router.get('/banner', async (req, res) => {
     try {
         // Retrieve three random records from the pulers table
         const result = await client.query("SELECT * FROM pulers ORDER BY RANDOM() LIMIT 3");
@@ -118,7 +118,7 @@ router.get('/puler', async (req, res) => {
 });
 
 
-router.delete('/:id',isAdmin,async (req, res) => {
+router.delete('/banner/:id',isAdmin,async (req, res) => {
     try {
         const id = req.params.id;
 

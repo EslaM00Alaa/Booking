@@ -106,7 +106,7 @@ async function isReady() {
     ];
 
     const tablesToCheck = [
-      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks"
+      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks","pulers"
     ];
 
     let c = 0;
