@@ -37,7 +37,7 @@ router.post("/owner/register", photoUpload.single("image"), async (req, res) => 
       );
     } else {
       result = await client.query(
-        `INSERT INTO users (user_name, mail, pass,role,active) VALUES ($1, $2, $3) RETURNING * ;`,
+        `INSERT INTO users (user_name, mail, pass,role,active) VALUES ($1, $2, $3 ,$4 ,$5) RETURNING * ;`,
         [user_name, mail, hashedPass,"owner",false]
       );
     }
