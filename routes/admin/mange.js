@@ -88,6 +88,56 @@ router.delete("/category/:id",isAdmin,async(req,res)=>{
 
 
 
+router.post('/puler', photoUpload.single("image"), isAdmin, async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ msg: "Image is required" });
+        }
+
+        const imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
+        await client.query("INSERT INTO pulers (img) VALUES ($1)", [imagePath]);
+
+        res.json({ msg: "One puler inserted." });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+});
+
+
+router.get('/puler', async (req, res) => {
+    try {
+        // Retrieve three random records from the pulers table
+        const result = await client.query("SELECT * FROM pulers ORDER BY RANDOM() LIMIT 3");
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+});
+
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const result = await client.query("DELETE FROM pulers WHERE id = $1 RETURNING *;", [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ msg: "Record not found" });
+        }
+
+        res.json({ msg: "Deleted successfully" });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+});
+
+
+
+
   module.exports = router ; 
 
 

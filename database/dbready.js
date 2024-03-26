@@ -94,6 +94,12 @@ async function isReady() {
         writer_id INT REFERENCES users(id),
         writed_id INT
        );
+      `,
+      `
+      CREATE TABLE IF NOT EXISTS pulers (
+        id SERIAL PRIMARY KEY,
+        img VARCHAR(300) NOT NULL
+       );
       `
       
 
