@@ -118,7 +118,7 @@ router.get('/puler', async (req, res) => {
 });
 
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',isAdmin,async (req, res) => {
     try {
         const id = req.params.id;
 
