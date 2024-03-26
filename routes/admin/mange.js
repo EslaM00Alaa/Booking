@@ -16,7 +16,7 @@ const express = require("express"),
         
         let imagePath = null;
         if (req.file) {
-            imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
+            imagePath = `https://booking-5e8t.onrender.com/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
         } else {
             return res.status(400).json({ msg: "Image is required" });
         }
@@ -62,7 +62,7 @@ router.put("/category/:id", photoUpload.single("image"), isAdmin, async (req, re
                 });
             }
 
-            imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
+            imagePath = `https://booking-5e8t.onrender.com/${req.file.filename}`; // Assuming images are stored in the "images" folder
             await client.query("UPDATE category SET image = $1 WHERE id = $2;", [imagePath, req.params.id]);
         }
         if (name) {
@@ -94,7 +94,7 @@ router.post('/banner', photoUpload.single("image"), isAdmin, async (req, res) =>
             return res.status(400).json({ msg: "Image is required" });
         }
 
-        const imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
+        const imagePath = `https://booking-5e8t.onrender.com/images/${req.file.filename}`; // Assuming images are stored in the "images" folder
         await client.query("INSERT INTO pulers (img) VALUES ($1)", [imagePath]);
 
         res.json({ msg: "One puler inserted." });
