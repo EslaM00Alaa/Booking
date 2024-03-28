@@ -34,6 +34,10 @@ app.use("/api",require("./routes/admin/mange"))
 app.use("/api",require("./routes/admin/owner_requests"))
 app.use("/api",require("./routes/admin/places_request"))
 app.use("/api",require("./routes/owner/places"))
+app.use("/api/user",require("./routes/user/info"))
+app.use("/api/rate",require("./routes/rated/rate"))
+app.use("/api",require("./routes/user/feedback"))
+
 
 
 

@@ -19,8 +19,9 @@ async function isReady() {
         pass VARCHAR(255) NOT NULL UNIQUE,
         role VARCHAR(255) DEFAULT 'user',
         active BOOLEAN DEFAULT true ,
-        image VARCHAR(255) DEFAULT 'http://localhost:6666/images/profile.png' 
-      );`,
+        image VARCHAR(255) DEFAULT 'https://asset.cloudinary.com/dkwx24lyh/abf23e713ea9eac7eaebb83f5b1b6ba0' ,
+        money DOUBLE PRECISION DEFAULT 0
+        );`,
           `
             CREATE TABLE IF NOT EXISTS category (
             id SERIAL PRIMARY KEY,
@@ -45,7 +46,8 @@ async function isReady() {
         address VARCHAR(500) NOT NULL,
         description VARCHAR(500) NOT NULL,
         nsign INT DEFAULT 0,
-        location VARCHAR(500) NOT NULL,
+        locationx VARCHAR(500) NOT NULL,
+        locationy VARCHAR(500) NOT NULL,
         min_hours REAL,
         hour_salary REAL
         );    
@@ -100,13 +102,21 @@ async function isReady() {
         id SERIAL PRIMARY KEY,
         img VARCHAR(300) NOT NULL
        );
+      `,
+      `
+      CREATE TABLE IF NOT EXISTS rated (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) NOT NULL UNIQUE,
+        rated_id INT NOT NULL ,
+        rate INT NOT NULL 
+        );
       `
       
 
     ];
 
     const tablesToCheck = [
-      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks","pulers"
+      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks","pulers","rated"
     ];
 
     let c = 0;

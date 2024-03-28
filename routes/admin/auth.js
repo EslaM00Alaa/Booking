@@ -1,3 +1,4 @@
+const { cloadinaryUploadImage } = require("../../utils/uploadimageCdn.js");
 
 const express = require("express"),
   client = require("../../database/db"),
@@ -18,25 +19,23 @@ router.post("/admin/register", photoUpload.single("image"), async (req, res) => 
   try {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).json({ msg: error.details[0].message });
-
+    const salt = await bcrypt.genSalt(10);
+    const hashedPass = await bcrypt.hash(req.body.pass, salt);
+    const { user_name, mail } = req.body;
+    let result;
     let imagePath = null; // Initialize imagePath
     if (req.file) {
       // Check if file is uploaded
-      imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "profile" folder
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPass = await bcrypt.hash(req.body.pass, salt);
-
-    const { user_name, mail } = req.body;
-    let result;
-    // Fix the query to insert user data into the database
-    if (imagePath) {
+      //imagePath = `http://localhost:6666/images/${req.file.filename}`; // Assuming images are stored in the "profile" folder
+      imagePath = path.join(__dirname, `../../images/${req.file.filename}`);
+      const uploadResult = await cloadinaryUploadImage(imagePath); // Fixed typo here
+      let { public_id, secure_url } = uploadResult;
       result = await client.query(
         `INSERT INTO users (user_name, mail, pass,role,image) VALUES ($1, $2, $3, $4,$5) RETURNING * ;`,
-        [user_name, mail, hashedPass,"admin",imagePath]
+        [user_name, mail, hashedPass,"admin",secure_url]
       );
-    } else {
+    }else 
+    {
       result = await client.query(
         `INSERT INTO users (user_name, mail, pass,role,active) VALUES ($1, $2, $3,$4) RETURNING * ;`,
         [user_name, mail, hashedPass,"owner",false]

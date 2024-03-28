@@ -1,5 +1,6 @@
 const isUser = require("../../middleware/isUser.js");
 const sendMail = require("../../utils/sendMail.js");
+const verifyToken = require("../../utils/veifytoken.js");
 
 const express = require("express"),
   client = require("../../database/db"),
@@ -14,12 +15,14 @@ const express = require("express"),
   router = express.Router();
 
 
-  router.post("/feedback", isUser, async (req, res) => {
+  router.post("/feedback/:writed_id", async (req, res) => {
     try {
         const { error } = validateFeedBack(req.body);
         if (error) return res.status(400).json({ msg: error.details[0].message });
 
-        const { id, description, writed_id } = req.body; 
+        let id = verifyToken(req.headers.token).id;
+        let writed_id = req.params.writed_id;
+        const   description = req.body.description; 
 
         await client.query("INSERT INTO feedbacks (description, writer_id, writed_id) VALUES ($1, $2, $3);", [description, id, writed_id]); // Fixed variable name
 
