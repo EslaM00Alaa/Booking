@@ -19,7 +19,12 @@ const express = require("express"),
         ) AS rate,
         ARRAY(
             SELECT 
-                ARRAY[user_data.image, user_data.user_name, f.description, (SELECT CAST(SUM(rate) / COUNT(r.rated_id) AS VARCHAR) FROM rated r WHERE r.rated_id = user_data.id)] AS rate
+                json_build_object(
+                    'image', user_data.image,
+                    'user_name', user_data.user_name,
+                    'description', f.description,
+                    'rate', (SELECT CAST(SUM(rate) / COUNT(r.rated_id) AS VARCHAR) FROM rated r WHERE r.rated_id = user_data.id)
+                )
             FROM 
                 users AS user_data  
             JOIN 
@@ -31,6 +36,7 @@ const express = require("express"),
         users AS u 
     WHERE 
         u.id = $1;
+    
     
         `, [req.params.id]);
 
