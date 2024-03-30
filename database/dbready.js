@@ -37,6 +37,55 @@ async function isReady() {
           );
        `,
        `
+       CREATE TABLE IF NOT EXISTS cities (
+         id SERIAL PRIMARY KEY,
+         name VARCHAR(300) NOT NULL
+        );
+        INSERT INTO cities (name) VALUES
+         ('الرياض'),
+         ('جدة'),
+         ('مكة المكرمة'),
+         ('الدمام'),
+         ('الخبر'),
+         ('الطائف'),
+         ('المدينة المنورة'),
+         ('بريدة'),
+         ('تبوك'),
+         ('خميس مشيط'),
+         ('حائل'),
+         ('الجبيل'),
+         ('الخرج'),
+         ('أبها'),
+         ('نجران'),
+         ('ينبع'),
+         ('القصيم'),
+         ('الظهران'),
+         ('الباحة'),
+         ('الأحساء'),
+         ('النماص'),
+         ('عرعر'),
+         ('سكاكا'),
+         ('جازان'),
+         ('عنيزة'),
+         ('القريات'),
+         ('الرس'),
+         ('صفوى'),
+         ('الخفجي'),
+         ('الدوادمي'),
+         ('الزلفي'),
+         ('رفحاء'),
+         ('شقراء'),
+         ('الدرعية'),
+         ('الرميلة'),
+         ('بيشة'),
+         ('الطائف'),
+         ('الظهران'),
+         ('الفرسان'),
+         ('المظيلف'),
+         ('المزاحمية'),
+         ('المويه');
+       `      ,
+       `
        CREATE TABLE IF NOT EXISTS places (
         id SERIAL PRIMARY KEY,
         owner_id INT REFERENCES users(id) NOT NULL,
@@ -46,8 +95,7 @@ async function isReady() {
         address VARCHAR(500) NOT NULL,
         description VARCHAR(500) NOT NULL,
         nsign INT DEFAULT 0,
-        locationx VARCHAR(500) NOT NULL,
-        locationy VARCHAR(500) NOT NULL,
+        city_id INT REFERENCES cities(id),
         min_hours REAL,
         hour_salary REAL
         );    
@@ -110,13 +158,13 @@ async function isReady() {
         rated_id INT NOT NULL ,
         rate INT NOT NULL 
         );
-      `
-      
+      `,
+     
 
     ];
 
     const tablesToCheck = [
-      "users","category","owner_attachment","places","place_attachment","places_images","days","free_day","feedbacks","pulers","rated"
+      "users","category","owner_attachment","cities","places","place_attachment","places_images","days","free_day","feedbacks","pulers","rated"
     ];
 
     let c = 0;
