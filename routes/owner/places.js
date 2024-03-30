@@ -1,9 +1,12 @@
 const isOwner = require("../../middleware/isOwner");
 const photoUpload = require("../../utils/uploadimage");
+const { cloadinaryUploadImage } = require("../../utils/uploadimageCdn");
 
 const express = require("express"),
 {validatePlace} = require("../../models/place"),
 client = require("../../database/db"),
+path = require("path"), // Add this line to import the path module
+fs = require("fs"),
 router = express.Router();
 
 
@@ -16,18 +19,21 @@ router.post("/place",photoUpload.array("image"),isOwner , async (req, res) => {
             if (error) return res.status(400).json({ msg: error.details[0].message });
 
             const {
-                id, name, address, description, location, min_hours, hour_salary, days,category
+                id, name, address, description, city, min_hours, hour_salary, days,category
             } = req.body;
 
         
-            const result = await client.query("INSERT INTO places (owner_id,category_id,name,address,description,location,min_hours,hour_salary) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id;", [id,category,name, address, description, location, min_hours, hour_salary]);
+            const result = await client.query("INSERT INTO places (owner_id,category_id,name,address,description,city,min_hours,hour_salary) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id;", [id,category,name, address, description, city, min_hours, hour_salary]);
             const place_id = result.rows[0].id;
 
             // Check if images are uploaded
             if (req.files && req.files.length > 0) {
                 for (let i = 0; i < req.files.length; i++) {
-                    const imagePath = `http://localhost:6666/images/${req.files[i].filename}`; // Assuming images are stored in the "images" folder
-                    await client.query("INSERT INTO places_images (place_id,image) VALUES ($1,$2);", [place_id, imagePath]);
+                  //  const imagePath = `http://localhost:6666/images/${req.files[i].filename}`; // Assuming images are stored in the "images" folder
+                  const imagePath = path.join(__dirname, `../../images/${req.files[i].filename}`);
+                  const uploadResult = await cloadinaryUploadImage(imagePath); // Fixed typo here
+                  const { public_id, secure_url } = uploadResult;
+                  await client.query("INSERT INTO places_images (place_id,image) VALUES ($1,$2);", [place_id, secure_url]);
                 }
             } else {
                 return res.status(400).json({ msg: "Images are required" });
@@ -52,12 +58,13 @@ router.post("/place/attachment/:placeid", photoUpload.single("image"), isOwner, 
     try {
      let place_id = req.params.placeid;
     
-      let imagePath = null;
-  
       if (req.file) {
-        imagePath = `http://localhost:6666/images/${req.file.filename}`;
+       // imagePath = `http://localhost:6666/images/${req.file.filename}`;
         // Insert the owner_id and attachment path into the owner_attachment table
-        await client.query("INSERT INTO place_attachment (place_id, attachment) VALUES ($1, $2)", [place_id, imagePath]);
+        const imagePath = path.join(__dirname, `../../images/${req.file.filename}`);
+        const uploadResult = await cloadinaryUploadImage(imagePath); // Fixed typo here
+        const { public_id, secure_url } = uploadResult;
+        await client.query("INSERT INTO place_attachment (place_id, attachment) VALUES ($1, $2)", [place_id, secure_url]);
         res.status(200).json({ msg: "Image uploaded successfully" });
       } else {
         // If no file is uploaded, return an error response

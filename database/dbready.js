@@ -95,7 +95,7 @@ async function isReady() {
         address VARCHAR(500) NOT NULL,
         description VARCHAR(500) NOT NULL,
         nsign INT DEFAULT 0,
-        city_id INT REFERENCES cities(id),
+        city INT REFERENCES cities(id),
         min_hours REAL,
         hour_salary REAL
         );    

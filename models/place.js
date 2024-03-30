@@ -5,7 +5,7 @@ function validatePlace(obj) {
         name: joi.string().trim().required(),
         address: joi.string().trim().required(),
         description: joi.string().trim().required(),
-        location: joi.string().trim().required(),
+        city:joi.number().required(),
         min_hours: joi.number().required(),
         hour_salary: joi.number().required(),
         category:joi.number().required(),
