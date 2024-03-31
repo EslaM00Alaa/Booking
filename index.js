@@ -38,7 +38,7 @@ app.use("/api/user",require("./routes/user/info"))
 app.use("/api/rate",require("./routes/rated/rate"))
 app.use("/api/feedback",require("./routes/user/feedback"))
 app.use("/api/cities",require("./routes/cities/getCities"))
-
+app.use("/api",require("./routes/places/place "));
 
 
 
